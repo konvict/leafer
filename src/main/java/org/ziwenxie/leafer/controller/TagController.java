@@ -49,16 +49,8 @@ public class TagController {
     @ResponseBody
     @PostMapping("/tag/n")
     public Tag newTag(@RequestParam("value") String tagName, Principal principal) {
-        Tag isTag = tagService.getOneTagByName(tagName, principal.getName());
-        if (isTag != null ) {
-            return isTag;
-        } else {
-            Tag tag = new Tag();
-            tag.setName(tagName);
-            tag.setUsername(principal.getName());
-            tagService.insertOneTag(tag, principal.getName());
-            return tag;
-        }
+        Tag tag = tagService.insertOneTag(tagName, principal.getName());
+        return tag;
     }
 
     @ResponseBody

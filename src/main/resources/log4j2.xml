@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d %-5p [%t] %c - %m%n"/> <!-- 定义每条日志的输出格式 -->
+        </Console>
+
+        <RollingFile name="run" fileName="./logs/run.log"
+             filePattern="./logs/run.log_%d{yyyy-MM-dd}.log">
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />
+            <PatternLayout pattern="%d %-5p [%t] %c - %m%n" />
+            <Policies>
+                <!-- 根据上面设置的filePattern每隔一天重命名前一天的日志 -->
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+        <Logger name="com.ibatis" level="info">
+            <appender-ref ref="console"/>
+        </Logger>
+
+        <Root level="info">
+            <appender-ref ref="console"/>
+            <appender-ref ref="run"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

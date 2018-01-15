@@ -23,11 +23,19 @@
 
     <script>
         $(document).ready(function () {
+            // pagenation
+            var cur = 1;
+            $('#page' + cur).addClass('active');
             $(".next").click(function (event) {
                 let page = $(this).text();
                 paginationArticle(page);
+
+                $('#page' + cur).removeClass('active');
+                $('#page' + page).addClass('active');
+                cur = page;
             });
-            getAllTags();
+
+            getAllTags(); // load sidebar tags
         });
     </script>
 
@@ -99,17 +107,20 @@
 
         </div><!-- row -->
 
+    <!-- footer -->
     <div class="row">
 
+        <!-- pagination -->
         <div class="text-center" style="margin-bottom: 50px">
             <ul class="pagination" th:if="${articlesCount &gt; 10}">
-                <li th:each="i : ${#numbers.sequence(1, articlesCount/10+1)}">
+                <li th:each="i : ${#numbers.sequence(1, (articlesCount-1)/10+1)}"
+                    class="page-item" th:id="'page' + ${i}">
                     <a href="#" class="next" th:text="${i}"></a>
                 </li>
             </ul>
-        </div>
+        </div> <!-- pagination -->
 
-    </div><!-- row -->
+    </div><!-- footer -->
 
 </div><!-- container -->
 

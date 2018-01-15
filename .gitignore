@@ -5,5 +5,5 @@ bin/
 *.iml
 .classpath
 .project
-leafer/
 upload/
+logs/

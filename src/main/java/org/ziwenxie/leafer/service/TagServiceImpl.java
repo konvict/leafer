@@ -24,6 +24,10 @@ public class TagServiceImpl implements ITagService {
 
     private Logger logger;
 
+    public final String allTagsKey = "allTagsKey";
+
+    public final String oneTagKey = "oneTagKey";
+
     @Autowired
     public TagServiceImpl(TagMapper tagMapper) {
         this.tagMapper = tagMapper;
@@ -33,8 +37,18 @@ public class TagServiceImpl implements ITagService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    @CacheEvict(value = "getAllTags", key = "#username")
-    public boolean insertOneTag(Tag tag, String username) {
+    @CacheEvict(value = "getAllTags", key = "#root.target.allTagsKey + #username")
+    public Tag insertOneTag(String tagName, String username) {
+        Tag isTag = getOneTagByName(tagName, username);
+
+        // 标签已经存在
+        if (isTag != null ) {
+            return isTag;
+        }
+
+        Tag tag = new Tag();
+        tag.setName(tagName);
+        tag.setUsername(username);
         tag.setId(idWorker.nextId());
         tag.setCreatedTime(new Date());
         tag.setModifiedTime(new Date());
@@ -42,14 +56,14 @@ public class TagServiceImpl implements ITagService {
         tagMapper.insertOneTag(tag);
 
         logger.info(username + " insert tag " + tag.getId() + " successfully");
-        return true;
+        return tag;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
-            @CacheEvict(value = "getOneTagById", key = "#tagId"),
-            @CacheEvict(value = "getAllTags", key = "#username")
+            @CacheEvict(value = "getOneTagById", key = "#root.target.oneTagKey + #tagId"),
+            @CacheEvict(value = "getAllTags", key = "#root.target.allTagsKey + #username")
     })
     public boolean deleteOneTagById(long tagId, String username) {
         tagMapper.deleteOneTagById(tagId);
@@ -59,19 +73,19 @@ public class TagServiceImpl implements ITagService {
     }
 
     @Override
-    @Cacheable(value = "getOneTagById", key = "#tagId")
+    @Cacheable(value = "getOneTagById#300#30", key = "#root.target.oneTagKey + #tagId")
     public Tag getOneTagById(long tagId) {
         return tagMapper.getOneTagById(tagId);
     }
 
     @Override
-    @Cacheable(value = "getOneTagByName", key = "#tagName + #username")
+    @Cacheable(value = "getOneTagByName#300#30", key = "#tagName + #username")
     public Tag getOneTagByName(String tagName, String username) {
         return tagMapper.getOneTagByName(tagName, username);
     }
 
     @Override
-    @Cacheable(value = "getAllTags", key = "#username")
+    @Cacheable(value = "getAllTags#300#30", key = "#root.target.allTagsKey + #username")
     public List<Tag> getAllTags(String username) {
         return tagMapper.getAllTags(username);
     }

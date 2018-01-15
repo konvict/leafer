@@ -28,6 +28,12 @@ public class ArticleServiceImpl implements IArticleService {
 
     private CacheManager cacheManager;
 
+    public final String oneArticleKey = "oneArticleKey";
+
+    public final String articleCountKey = "articleCountKey";
+
+    public final String articleTagKey = "articleTagKey";
+
     @Autowired
     public ArticleServiceImpl(ArticleMapper articleMapper, CacheManager cacheManager) {
         this.articleMapper = articleMapper;
@@ -39,8 +45,8 @@ public class ArticleServiceImpl implements IArticleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
-            @CacheEvict(value = "getOneArticleById", key = "#article.id"),
-            @CacheEvict(value = "getArticlesCount", key = "#article.username")
+            @CacheEvict(value = "getOneArticleById", key =  "#root.target.oneArticleKey + #article.id"),
+            @CacheEvict(value = "getArticlesCount", key = "#root.target.articleCountKey + #username")
     })
     public long insertOneArticle(Article article) {
         long articleId = idWorker.nextId();
@@ -60,14 +66,14 @@ public class ArticleServiceImpl implements IArticleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
-            @CacheEvict(value = "getOneArticleById", key = "#articleId"),
-            @CacheEvict(value = "getArticlesCount", key = "#username")
+            @CacheEvict(value = "getOneArticleById", key = "#root.target.oneArticleKey + #articleId"),
+            @CacheEvict(value = "getArticlesCount", key = "#root.target.articleCountKey + #username")
     })
     public boolean deleteOneArticleById(long articleId, String username) {
         articleMapper.deleteOneArticleById(articleId);
         logger.info(username + " delete article " + articleId + " successfully");
 
-        deleteAllPagesCache(username);
+        deleteAllPagesCache(username); // delete all pages' cache
 
         return true;
     }
@@ -75,7 +81,7 @@ public class ArticleServiceImpl implements IArticleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Caching(evict = {
-            @CacheEvict(value = "getOneArticleById", key = "#article.id"),
+            @CacheEvict(value = "getOneArticleById", key = "#root.target.oneArticleKey + #article.id"),
             @CacheEvict(value = "getArticlesOfOnePage", key = "#username + #page")
     })
     public boolean updateOneArticle(Article article, String username, int page) {
@@ -89,25 +95,25 @@ public class ArticleServiceImpl implements IArticleService {
     }
 
     @Override
-    @Cacheable(value = "getArticlesOfOnePage", key = "#username + #page")
+    @Cacheable(value = "getArticlesOfOnePage#300#30", key = "#username + #page")
     public List<Article> getArticlesOfOnePage(String username, int page) {
         return articleMapper.getArticlesOfOnePage(username, (page -1)*10);
     }
 
     @Override
-    @Cacheable(value = "getOneArticleById", key = "#id")
+    @Cacheable(value = "getOneArticleById#300#30", key = "#root.target.oneArticleKey + #id")
     public Article getOneArticleById(long id, String username) {
         return articleMapper.getOneArticleById(id);
     }
 
     @Override
-    @Cacheable(value = "getAllTagsOfOneArticle", key = "#id")
+    @Cacheable(value = "getAllTagsOfOneArticle#300#30", key = "#root.target.articleTagKey + #id")
     public List<Tag> getAllTagsOfOneArticle(long id) {
         return articleMapper.getAllTagsOfOneArticle(id);
     }
 
     @Override
-    @Cacheable(value = "getArticlesCount", key = "#username")
+    @Cacheable(value = "getArticlesCount#300#30", key = "#root.target.articleCountKey + #username")
     public long getArticlesCount(String username) {
         return articleMapper.getArticlesCount(username);
     }

@@ -3,14 +3,23 @@ package org.ziwenxie.leafer.util;
 public class IdWorker {
 
     private final long workerId;
+
     private final static long twepoch = 1361753741828L;
+
     private long sequence = 0L;
+
     private final static long workerIdBits = 4L;
+
     public final static long maxWorkerId = -1L ^ -1L << workerIdBits;
+
     private final static long sequenceBits = 10L;
+
     private final static long workerIdShift = sequenceBits;
+
     private final static long timestampLeftShift = sequenceBits + workerIdBits;
+
     public final static long sequenceMask = -1L ^ -1L << sequenceBits;
+
     private long lastTimestamp = -1L;
 
     public IdWorker(final long workerId) {

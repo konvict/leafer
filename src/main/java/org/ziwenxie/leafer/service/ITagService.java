@@ -6,9 +6,13 @@ import java.util.List;
 
 public interface ITagService {
 
-    boolean insertOneTag(Tag tag, String username);
+    Tag insertOneTag(String tagName, String username);
+
     boolean deleteOneTagById(long tagId, String username);
+
     Tag getOneTagById(long tagId);
+
     Tag getOneTagByName(String tagName, String username);
+
     List<Tag> getAllTags(String username);
 }

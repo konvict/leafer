@@ -9,7 +9,7 @@ $ git clone https://github.com/ziwenxie/leafer
 $ cd leafer
 ```
 
-然后修改`/src/main/resources/application.properties`中本地MySQL数据库的配置：
+修改`/src/main/resources/application.properties`中本地MySQL数据库的配置：
 
 ```xml
 spring.datasource.url=jdbc:mysql://localhost:3306/数据库名
@@ -17,13 +17,16 @@ spring.datasource.username=用户名
 spring.datasource.password=密码
 ```
 
-最后将`leafer.sql`下面的`sql`语句复制到上面指定的数据库中，就可以执行下面maven命令运行了：
+在新版的leafer中我将缓存从EhCache改成了Redis，所以大家需要在本地安装一下Redis，然后按照默认配置使用6379端口号就行了。如果想要自定义Redis的参数只需要在上面的`application.properties`文件中修改即可。
+
+然后将`leafer.sql`下面的`sql`语句复制到上面指定的数据库中，执行下面的maven命令就可以运行了：
 
 ```bash
 $ mvn spring-boot:run
 ```
 
-在浏览器中打开`localhost:8080`使用默认的用户名`admin`以及登录密码`123456`登录即可。
+在浏览器中打开`localhost:8080`使用默认的用户名`admin`以及登录密码`123456`登录就行了。
+
 
 ## 功能特性
 
